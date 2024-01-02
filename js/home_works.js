@@ -52,78 +52,41 @@ moveBlock()
 const start = document.querySelector('#start')
 const stop = document.querySelector('#stop')
 const reset = document.querySelector('#reset')
+const display = document.querySelector('#secondsS') 
 
-let count = 0
+let count = -1
 let interval = null
-const display = 0
 
-function number () {
+function number() {
     count++;
-    display.textContent = count
+    display.textContent = count; 
 }
 
-number()
+number(); 
 
-start.addEventListener("click",() =>{
-    if (!interval){
+start.addEventListener("click", () => {
+    if (!interval) {
         start.disabled = true
         stop.disabled = false
-        interval = setInterval(number, 0.001)
+        interval = setInterval(number, 1000)
     }
 })
 
-stop.addEventListener("click", () =>{
-    if(interval){
+stop.addEventListener("click", () => {
+    if (interval) {
         start.disabled = false
         stop.disabled = true
         clearInterval(interval)
         interval = null
     }
-
 })
 
-reset.addEventListener("click",() => {
+reset.addEventListener("click", () => {
     start.disabled = false
     stop.disabled = true
     clearInterval(interval)
     interval = null
     count = 0
-    display.textContent = count
+    display.textContent = count 
 })
-
 // 3 hw
-
-// 2
-
-function showModal() {
-    const modal = document.querySelector('.modal_scroll');
-    modal.style.display = 'block';
-    window.removeEventListener('scroll', scrollHandler);
-}
-
-function scrollHandler() {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        showModal(); 
-    }
-}
-
-document.querySelector('.modal_scroll_close').addEventListener('click', () => {
-    const modal = document.querySelector('.modal_scroll');
-    modal.style.display = 'none';
-})
-
-window.addEventListener('scroll', scrollHandler);
-
-// 3 
-
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        const modal = document.querySelector('.modal');
-        modal.style.display = 'block';
-    }, 10000);
-});
-
-document.querySelector('.modal_close').addEventListener('click', () => {
-    const modal = document.querySelector('.modal');
-    modal.style.display = 'none';
-})

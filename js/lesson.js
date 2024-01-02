@@ -1,5 +1,25 @@
 // 3 hw 
+document.addEventListener('DOMContentLoaded', function () {
+    const phoneInput = document.getElementById('phone_input');
+    const phoneButton = document.getElementById('phone_button');
+    const phoneResult = document.getElementById('phone_result');
 
+    phoneButton.addEventListener('click', function () {
+        const phoneNumber = phoneInput.value.trim();
+        if (isValidPhoneNumber(phoneNumber)) {
+            phoneResult.textContent = 'Valid phone number';
+            phoneResult.style.color = 'green';
+        } else {
+            phoneResult.textContent = 'Invalid phone number';
+            phoneResult.style.color = 'red';
+        }
+    });
+
+    function isValidPhoneNumber(phone) {
+        const phonePattern = /^\+996\d{9}$/;
+        return phonePattern.test(phone);
+    }
+});
 // 3 
 
 const tabContBlock = document.querySelectorAll('.tab_content_block')
@@ -54,6 +74,11 @@ const eur = document.querySelector('#eur');
 const fetchData = async () => {
     try {
         const response = await fetch('../data/converter.json');
+        if (!response.ok) {
+            throw new Error('Ошибка при загрузке данных');
+        }
+        const data = await response.json();
+        return data;
     } catch (error) {
         console.error('Не удалось получить данные:', error);
         return null;
@@ -62,25 +87,35 @@ const fetchData = async () => {
 
 const convertCurrency = async (element, targetElement, current, data) => {
     try {
+        if (!data) {
+            throw new Error('Данные для конвертации недоступны');
+        }
+
         switch (current) {
             case 'som':
-                targetElement.value = (element.value / data.usd).toFixed(2);
+                usd.value = (element.value / data.usd).toFixed(2);
+                eur.value = (element.value / data.eur).toFixed(2);
                 break;
             case 'usd':
-                targetElement.value = (element.value * data.usd).toFixed(2);
+                som.value = (element.value * data.usd).toFixed(2);
+                eur.value = (element.value / data.eur).toFixed(2);
                 break;
             case 'eur':
                 if (targetElement === som) {
-                    targetElement.value = (element.value * data.eur / data.usd).toFixed(2);
+                    som.value = (element.value * data.eur).toFixed(2);
+                    usd.value = (element.value * data.eur / data.usd).toFixed(2);
                 } else if (targetElement === usd) {
-                    targetElement.value = (element.value * data.eur).toFixed(2);
+                    usd.value = (element.value / data.eur).toFixed(2);
+                    som.value = (element.value * data.eur / data.usd).toFixed(2);
                 }
                 break;
             default:
                 break;
         }
         if (element.value === '') {
-            targetElement.value = ''; 
+            som.value = '';
+            usd.value = '';
+            eur.value = '';
         }
     } catch (error) {
         console.error('Ошибка конвертации:', error);
@@ -106,6 +141,7 @@ eur.addEventListener('input', () => {
     handleInputChange(eur, som, 'eur');
     handleInputChange(eur, usd, 'eur');
 });
+
 
 // 6 hw
 
@@ -153,3 +189,39 @@ const fetchAndDisplayPosts = () => {
 };
 
 fetchAndDisplayPosts();
+
+//
+
+document.addEventListener('DOMContentLoaded', function() {
+    const apiKey = 'YOUR_OPENWEATHERMAP_API_KEY'; // Замените на свой API ключ от OpenWeatherMap
+    const searchBtn = document.querySelector('.searchBtn');
+    const cityNameInput = document.querySelector('.cityName');
+    const citySpan = document.querySelector('.city');
+    const tempSpan = document.querySelector('.temp');
+
+    searchBtn.addEventListener('click', async function() {
+        const cityName = cityNameInput.value.trim();
+        if (cityName !== '') {
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`);
+                if (!response.ok) {
+                    throw new Error('Город не найден');
+                }
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                console.error('Ошибка:', error);
+                citySpan.textContent = 'Город не найден';
+                tempSpan.textContent = '';
+            }
+        }
+    });
+
+    function displayWeather(data) {
+        citySpan.textContent = data.name;
+        tempSpan.textContent = `Температура: ${data.main.temp}°C`;
+    }
+});
+
+//
+
